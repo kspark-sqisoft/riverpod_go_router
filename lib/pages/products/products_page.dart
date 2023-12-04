@@ -9,6 +9,7 @@ import 'package:riverpod_go_router/providers/auth_state_provider.dart';
 import 'package:riverpod_go_router/providers/theme_provider.dart';
 import 'package:riverpod_go_router/router/route_names.dart';
 import 'package:riverpod_go_router/router/router_state_full_shell_provider.dart';
+import 'package:scrolls_to_top/scrolls_to_top.dart';
 
 class ProductsPage extends ConsumerStatefulWidget {
   const ProductsPage({
@@ -92,85 +93,94 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
               Expanded(
                 child: RefreshIndicator(
                   onRefresh: () async => _pagingController.refresh(),
-                  child: PagedListView<int, Product>.separated(
-                    shrinkWrap: true,
-                    pagingController: _pagingController,
-                    scrollController: _scrollController,
-                    builderDelegate: PagedChildBuilderDelegate(
-                      itemBuilder: (context, product, index) {
-                        return GestureDetector(
-                          onTap: () {
-                            context.goNamed(RouteNames.product,
-                                pathParameters: {'id': product.id.toString()});
-                          },
-                          child: Row(
-                            children: [
-                              const SizedBox(
-                                width: 20,
-                              ),
-                              CircleAvatar(
-                                radius: 30,
-                                backgroundImage:
-                                    NetworkImage(product.thumbnail),
-                                child: Text(
-                                  product.id.toString(),
-                                  style:
-                                      const TextStyle(color: Colors.lightGreen),
+                  child: ScrollsToTop(
+                    onScrollsToTop: (ScrollsToTopEvent event) async {
+                      _scrollController.animateTo(0,
+                          duration: const Duration(milliseconds: 500),
+                          curve: Curves.linear);
+                    },
+                    child: PagedListView<int, Product>.separated(
+                      shrinkWrap: true,
+                      pagingController: _pagingController,
+                      scrollController: _scrollController,
+                      builderDelegate: PagedChildBuilderDelegate(
+                        itemBuilder: (context, product, index) {
+                          return GestureDetector(
+                            onTap: () {
+                              context.goNamed(RouteNames.product,
+                                  pathParameters: {
+                                    'id': product.id.toString()
+                                  });
+                            },
+                            child: Row(
+                              children: [
+                                const SizedBox(
+                                  width: 20,
                                 ),
-                              ),
-                              Expanded(
-                                child: ListTile(
-                                  title: Text(product.title),
-                                  subtitle: Text(product.brand),
+                                CircleAvatar(
+                                  radius: 30,
+                                  backgroundImage:
+                                      NetworkImage(product.thumbnail),
+                                  child: Text(
+                                    product.id.toString(),
+                                    style: const TextStyle(
+                                        color: Colors.lightGreen),
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        );
-                      },
-                      noMoreItemsIndicatorBuilder: (context) => const Center(
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(vertical: 20.0),
-                          child: Text(
-                            'No more products!',
-                            style: TextStyle(fontSize: 20),
+                                Expanded(
+                                  child: ListTile(
+                                    title: Text(product.title),
+                                    subtitle: Text(product.brand),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          );
+                        },
+                        noMoreItemsIndicatorBuilder: (context) => const Center(
+                          child: Padding(
+                            padding: EdgeInsets.symmetric(vertical: 20.0),
+                            child: Text(
+                              'No more products!',
+                              style: TextStyle(fontSize: 20),
+                            ),
                           ),
                         ),
-                      ),
-                      firstPageErrorIndicatorBuilder: (context) {
-                        return Padding(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 50,
-                            horizontal: 30,
-                          ),
-                          child: Column(
-                            children: [
-                              const Text(
-                                'Something went wrong',
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(height: 20),
-                              Text(
-                                '${_pagingController.error}',
-                                style: const TextStyle(fontSize: 18),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 20),
-                              OutlinedButton(
-                                onPressed: () => _pagingController.refresh(),
-                                child: const Text(
-                                  'Try Again!',
+                        firstPageErrorIndicatorBuilder: (context) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(
+                              vertical: 50,
+                              horizontal: 30,
+                            ),
+                            child: Column(
+                              children: [
+                                const Text(
+                                  'Something went wrong',
                                   style: TextStyle(fontSize: 20),
                                 ),
-                              )
-                            ],
-                          ),
-                        );
+                                const SizedBox(height: 20),
+                                Text(
+                                  '${_pagingController.error}',
+                                  style: const TextStyle(fontSize: 18),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 20),
+                                OutlinedButton(
+                                  onPressed: () => _pagingController.refresh(),
+                                  child: const Text(
+                                    'Try Again!',
+                                    style: TextStyle(fontSize: 20),
+                                  ),
+                                )
+                              ],
+                            ),
+                          );
+                        },
+                      ),
+                      separatorBuilder: (context, index) {
+                        return const Divider();
                       },
                     ),
-                    separatorBuilder: (context, index) {
-                      return const Divider();
-                    },
                   ),
                 ),
               ),

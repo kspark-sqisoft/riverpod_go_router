@@ -7,6 +7,7 @@ import 'package:riverpod_go_router/pages/todos/providers/todo_item_provider.dart
 import 'package:riverpod_go_router/pages/todos/providers/todo_list_provider.dart';
 import 'package:riverpod_go_router/pages/todos/providers/todo_search_provider.dart';
 import 'package:riverpod_go_router/pages/todos/widgets/todo_item.dart';
+import 'package:scrolls_to_top/scrolls_to_top.dart';
 
 class ShowTodos extends ConsumerStatefulWidget {
   const ShowTodos({super.key});
@@ -103,21 +104,28 @@ class _ShowTodosState extends ConsumerState<ShowTodos> {
 
         final filteredTodos = filterTodos(allTodos);
 
-        prevTodosWidget = ListView.separated(
-          controller: _scrollController,
-          itemCount: filteredTodos.length,
-          separatorBuilder: (BuildContext context, int index) {
-            return const Divider(color: Colors.grey);
+        prevTodosWidget = ScrollsToTop(
+          onScrollsToTop: (ScrollsToTopEvent event) async {
+            _scrollController.animateTo(0,
+                duration: const Duration(milliseconds: 500),
+                curve: Curves.linear);
           },
-          itemBuilder: (BuildContext context, int index) {
-            final todo = filteredTodos[index];
-            return ProviderScope(
-              overrides: [
-                todoItemProvider.overrideWithValue(todo),
-              ],
-              child: const TodoItem(),
-            );
-          },
+          child: ListView.separated(
+            controller: _scrollController,
+            itemCount: filteredTodos.length,
+            separatorBuilder: (BuildContext context, int index) {
+              return const Divider(color: Colors.grey);
+            },
+            itemBuilder: (BuildContext context, int index) {
+              final todo = filteredTodos[index];
+              return ProviderScope(
+                overrides: [
+                  todoItemProvider.overrideWithValue(todo),
+                ],
+                child: const TodoItem(),
+              );
+            },
+          ),
         );
         return prevTodosWidget;
       },
