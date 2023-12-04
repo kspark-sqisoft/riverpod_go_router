@@ -64,8 +64,11 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
   Widget build(BuildContext context) {
     ref.listen(changeRouteProvider, (p, n) {
       if (n.routeType == ChangeRouteType.going && n.routeName == '/products') {
-        _scrollController.animateTo(0,
-            duration: const Duration(milliseconds: 500), curve: Curves.linear);
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(0,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.linear);
+        }
       }
     });
     return SafeArea(
@@ -95,9 +98,11 @@ class _ProductsPageState extends ConsumerState<ProductsPage> {
                   onRefresh: () async => _pagingController.refresh(),
                   child: ScrollsToTop(
                     onScrollsToTop: (ScrollsToTopEvent event) async {
-                      _scrollController.animateTo(0,
-                          duration: const Duration(milliseconds: 500),
-                          curve: Curves.linear);
+                      if (_scrollController.hasClients) {
+                        _scrollController.animateTo(0,
+                            duration: const Duration(milliseconds: 500),
+                            curve: Curves.linear);
+                      }
                     },
                     child: PagedListView<int, Product>.separated(
                       shrinkWrap: true,

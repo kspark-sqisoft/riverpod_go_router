@@ -82,8 +82,11 @@ class _ShowTodosState extends ConsumerState<ShowTodos> {
 
     ref.listen(changeRouteProvider, (p, n) {
       if (n.routeType == ChangeRouteType.going && n.routeName == '/todos') {
-        _scrollController.animateTo(0,
-            duration: const Duration(milliseconds: 500), curve: Curves.linear);
+        if (_scrollController.hasClients) {
+          _scrollController.animateTo(0,
+              duration: const Duration(milliseconds: 500),
+              curve: Curves.linear);
+        }
       }
     });
 
@@ -106,9 +109,11 @@ class _ShowTodosState extends ConsumerState<ShowTodos> {
 
         prevTodosWidget = ScrollsToTop(
           onScrollsToTop: (ScrollsToTopEvent event) async {
-            _scrollController.animateTo(0,
-                duration: const Duration(milliseconds: 500),
-                curve: Curves.linear);
+            if (_scrollController.hasClients) {
+              _scrollController.animateTo(0,
+                  duration: const Duration(milliseconds: 500),
+                  curve: Curves.linear);
+            }
           },
           child: ListView.separated(
             controller: _scrollController,
