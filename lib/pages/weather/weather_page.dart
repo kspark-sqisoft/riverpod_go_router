@@ -52,7 +52,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
     } finally {
       setState(() => loading = false);
     }
-    ref.read(weatherProvider.notifier).fetchWeather(city!);
+    //ref.read(weatherProvider.notifier).fetchWeather(city!);
   }
 
   @override
@@ -64,7 +64,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
   @override
   Widget build(BuildContext context) {
     ref.listen<AsyncValue<CurrentWeather?>>(
-      weatherProvider,
+      weatherProvider(city),
       (previous, next) {
         next.whenOrNull(
           data: (CurrentWeather? currentWeather) {
@@ -89,24 +89,30 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
     ref.listen(changeRouteProvider, (p, n) {
       if (n.routeType == ChangeRouteType.going && n.routeName == '/weather') {
         if (city != null) {
-          ref.read(weatherProvider.notifier).fetchWeather(city.toString());
+          ref
+              .read(weatherProvider(city).notifier)
+              .fetchWeather(city.toString());
         }
       }
       if (n.routeType == ChangeRouteType.restoring &&
           n.routeName == '/weather') {
         if (city != null) {
-          ref.read(weatherProvider.notifier).fetchWeather(city.toString());
+          ref
+              .read(weatherProvider(city).notifier)
+              .fetchWeather(city.toString());
         }
       }
     });
 
-    final weatherState = ref.watch(weatherProvider);
+    final weatherState = ref.watch(weatherProvider(city));
 
     return SafeArea(
       child: RefreshIndicator(
         onRefresh: () async {
           if (city != null) {
-            ref.read(weatherProvider.notifier).fetchWeather(city.toString());
+            ref
+                .read(weatherProvider(city).notifier)
+                .fetchWeather(city.toString());
           }
         },
         child: Scaffold(
@@ -131,7 +137,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
                             print('search city:$city');
                             if (city != null) {
                               ref
-                                  .read(weatherProvider.notifier)
+                                  .read(weatherProvider(city).notifier)
                                   .fetchWeather(city.toString());
                             }
                           },
@@ -142,7 +148,7 @@ class _WeatherPageState extends ConsumerState<WeatherPage> {
                             //ref.invalidate(weatherProvider);
                             if (city != null) {
                               ref
-                                  .read(weatherProvider.notifier)
+                                  .read(weatherProvider(city).notifier)
                                   .fetchWeather(city.toString());
                             }
                           },

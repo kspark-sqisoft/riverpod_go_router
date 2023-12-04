@@ -9,12 +9,16 @@ class Weather extends _$Weather {
   Object? key;
 
   @override
-  FutureOr<CurrentWeather?> build() {
+  FutureOr<CurrentWeather?> build(String? city) async {
     key = Object();
     ref.onDispose(() {
       key = null;
     });
-    return Future<CurrentWeather?>.value(null);
+    if (city == null) {
+      return Future.value(null);
+    } else {
+      return await ref.read(weatherRepositoryProvider).fetchWeather(city);
+    }
   }
 
   Future<void> fetchWeather(String city) async {
